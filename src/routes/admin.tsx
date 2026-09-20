@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CATEGORIAS, brl, isAdminUnlocked, lockAdmin, unlockAdmin, useMerchants, useProducts, type Product } from "@/lib/shop";
+import { CATEGORIAS, brl, isAdminUnlocked, lockAdmin, parseFotos, unlockAdmin, useMerchants, useProducts, type Product } from "@/lib/shop";
 import { supabase, SUPABASE_BUCKET } from "@/lib/supabase";
-import { Pencil, Trash2, Upload, Youtube, Instagram, Store, UserPlus, ExternalLink } from "lucide-react";
+import { Pencil, Trash2, Upload, Youtube, Instagram, Store, UserPlus, ExternalLink, Copy } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 const vazio = { nome:"", lojistaId:"", loja:"", whatsapp:"", breveDescricao:"", descricao:"", modelo:"", cores:"", tamanhos:"", preco:"", categoria:CATEGORIAS[0] ?? "", fotos:"", youtubeUrl:"", instagramVideoUrl:"" };
-const vazioLojista = { nomeLoja:"", responsavel:"", whatsapp:"", email:"", instagram:"", descricao:"" };
+const vazioLojista = { nomeLoja:"", responsavel:"", whatsapp:"", email:"", instagram:"", descricao:"", categoria:CATEGORIAS[0] ?? "" };
 
 function Admin() {
   const navigate = useNavigate();
@@ -46,7 +46,9 @@ function Admin() {
     <Button variant="ghost" className="w-full" asChild><Link to="/">Voltar à loja</Link></Button>
   </div></div>;
 
-  const carregar=(p:Product)=>{const merchant=merchants.find(m=>m.nomeLoja===p.loja&&m.whatsapp===p.whatsapp);setEditando(p.id);setAba("produtos");setForm({nome:p.nome,lojistaId:merchant?.id??"",loja:p.loja,whatsapp:p.whatsapp,breveDescricao:p.breveDescricao,descricao:p.descricao,modelo:p.modelo,cores:p.cores.join(", "),tamanhos:p.tamanhos.join(", "),preco:String(p.preco),categoria:p.categoria,fotos:p.fotos.join(", "),youtubeUrl:p.youtubeUrl||"",instagramVideoUrl:p.instagramVideoUrl||""});window.scrollTo({top:0,behavior:"smooth"});};
+  const preencher=(p:Product,id:string|null)=>{const merchant=merchants.find(m=>m.nomeLoja===p.loja&&m.whatsapp===p.whatsapp);setEditando(id);setAba("produtos");setForm({nome:id?p.nome:`${p.nome} (cópia)`,lojistaId:merchant?.id??"",loja:p.loja,whatsapp:p.whatsapp,breveDescricao:p.breveDescricao,descricao:p.descricao,modelo:p.modelo,cores:p.cores.join(", "),tamanhos:p.tamanhos.join(", "),preco:String(p.preco),categoria:p.categoria,fotos:p.fotos.join("\n"),youtubeUrl:p.youtubeUrl||"",instagramVideoUrl:p.instagramVideoUrl||""});window.scrollTo({top:0,behavior:"smooth"});};
+  const carregar=(p:Product)=>preencher(p,p.id);
+  const duplicar=(p:Product)=>{preencher(p,null);toast.success("Produto duplicado no formulário. Ajuste e clique em Cadastrar produto.");};
 
   const fotosSelecionadas=async(e:React.ChangeEvent<HTMLInputElement>)=>{
     const files=Array.from(e.target.files??[]);
@@ -54,26 +56,26 @@ function Admin() {
     const invalid=files.find(f=>!f.type.startsWith("image/")||f.size>3*1024*1024);
     if(invalid){toast.error("Use imagens de até 3 MB cada.");return;}
     const urls=await Promise.all(files.map(file=>new Promise<string>((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result));r.onerror=reject;r.readAsDataURL(file);})));
-    setForm(f=>({...f,fotos:[...f.fotos.split(",").map(s=>s.trim()).filter(Boolean),...urls].join(", ")}));
+    setForm(f=>({...f,fotos:[...parseFotos(f.fotos),...urls].join("\n")}));
     e.target.value="";
   };
 
   const salvar=()=>{
     if(!form.nome.trim()||!form.loja.trim()||!form.whatsapp.trim()||!form.preco){toast.error("Preencha nome, loja, WhatsApp e preço.");return;}
-    const dados={nome:form.nome.trim(),loja:form.loja.trim(),whatsapp:form.whatsapp.trim(),breveDescricao:form.breveDescricao.trim(),descricao:form.descricao.trim(),modelo:form.modelo.trim(),cores:form.cores.split(",").map(s=>s.trim()).filter(Boolean),tamanhos:form.tamanhos.split(",").map(s=>s.trim()).filter(Boolean),preco:Number(form.preco.replace(",","."))||0,categoria:form.categoria,fotos:form.fotos.split(",").map(s=>s.trim()).filter(Boolean),youtubeUrl:form.youtubeUrl.trim(),instagramVideoUrl:form.instagramVideoUrl.trim()};
+    const dados={nome:form.nome.trim(),loja:form.loja.trim(),whatsapp:form.whatsapp.trim(),breveDescricao:form.breveDescricao.trim(),descricao:form.descricao.trim(),modelo:form.modelo.trim(),cores:form.cores.split(",").map(s=>s.trim()).filter(Boolean),tamanhos:form.tamanhos.split(",").map(s=>s.trim()).filter(Boolean),preco:Number(form.preco.replace(",","."))||0,categoria:form.categoria,fotos:parseFotos(form.fotos),youtubeUrl:form.youtubeUrl.trim(),instagramVideoUrl:form.instagramVideoUrl.trim()};
     if(editando){updateProduct({...dados,id:editando});toast.success("Produto atualizado.");}else{addProduct(dados);toast.success("Produto cadastrado.");}
     setForm({...vazio});setEditando(null);
   };
 
-  const cadastrarLojista=()=>{if(!lojista.nomeLoja.trim()||!lojista.responsavel.trim()||!lojista.whatsapp.trim()){toast.error("Preencha loja, responsável e WhatsApp.");return;}addMerchant({...lojista,nomeLoja:lojista.nomeLoja.trim(),responsavel:lojista.responsavel.trim(),whatsapp:lojista.whatsapp.trim(),email:lojista.email.trim(),instagram:lojista.instagram.trim(),descricao:lojista.descricao.trim()});toast.success("Lojista cadastrado.");setLojista({...vazioLojista});};
+  const cadastrarLojista=()=>{if(!lojista.nomeLoja.trim()||!lojista.responsavel.trim()||!lojista.whatsapp.trim()){toast.error("Preencha loja, responsável e WhatsApp.");return;}addMerchant({...lojista,nomeLoja:lojista.nomeLoja.trim(),responsavel:lojista.responsavel.trim(),whatsapp:lojista.whatsapp.trim(),email:lojista.email.trim(),instagram:lojista.instagram.trim(),descricao:lojista.descricao.trim(),categoria:lojista.categoria});toast.success("Lojista cadastrado.");setLojista({...vazioLojista});};
 
-  const carregarLojista=(id:string)=>{const m=merchants.find(x=>x.id===id);if(!m)return;setEditandoLojista(id);setLojista({nomeLoja:m.nomeLoja,responsavel:m.responsavel,whatsapp:m.whatsapp,email:m.email,instagram:m.instagram,descricao:m.descricao});};
+  const carregarLojista=(id:string)=>{const m=merchants.find(x=>x.id===id);if(!m)return;setEditandoLojista(id);setLojista({nomeLoja:m.nomeLoja,responsavel:m.responsavel,whatsapp:m.whatsapp,email:m.email,instagram:m.instagram,descricao:m.descricao,categoria:m.categoria??CATEGORIAS[0]??""});};
 
   const salvarEdicaoLojista=()=>{
     if(!editandoLojista)return;
     const anterior=merchants.find(x=>x.id===editandoLojista);if(!anterior)return;
     if(!lojista.nomeLoja.trim()||!lojista.responsavel.trim()||!lojista.whatsapp.trim()){toast.error("Preencha loja, responsável e WhatsApp.");return;}
-    const atualizado={...anterior,nomeLoja:lojista.nomeLoja.trim(),responsavel:lojista.responsavel.trim(),whatsapp:lojista.whatsapp.trim(),email:lojista.email.trim(),instagram:lojista.instagram.trim(),descricao:lojista.descricao.trim()};
+    const atualizado={...anterior,nomeLoja:lojista.nomeLoja.trim(),responsavel:lojista.responsavel.trim(),whatsapp:lojista.whatsapp.trim(),email:lojista.email.trim(),instagram:lojista.instagram.trim(),descricao:lojista.descricao.trim(),categoria:lojista.categoria};
     updateMerchant(atualizado);
     products.filter(p=>p.loja===anterior.nomeLoja&&p.whatsapp===anterior.whatsapp).forEach(p=>updateProduct({...p,loja:atualizado.nomeLoja,whatsapp:atualizado.whatsapp}));
     toast.success("Lojista atualizado.");
@@ -93,6 +95,7 @@ function Admin() {
         <Field label="WhatsApp *"><Input value={lojista.whatsapp} onChange={e=>setLojista({...lojista,whatsapp:e.target.value})}/></Field>
         <Field label="E-mail"><Input type="email" value={lojista.email} onChange={e=>setLojista({...lojista,email:e.target.value})}/></Field>
         <Field label="Instagram da loja"><Input value={lojista.instagram} onChange={e=>setLojista({...lojista,instagram:e.target.value})}/></Field>
+        <Field label="Categoria do lojista"><Select value={lojista.categoria} onValueChange={v=>setLojista({...lojista,categoria:v})}><SelectTrigger><SelectValue placeholder="Selecione a categoria"/></SelectTrigger><SelectContent>{CATEGORIAS.map(c=><SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select></Field>
         <Field label="Descrição"><Textarea value={lojista.descricao} onChange={e=>setLojista({...lojista,descricao:e.target.value})}/></Field>
         <div className="flex gap-2"><Button className="flex-1" onClick={salvarEdicaoLojista}>Salvar alterações</Button><Button variant="outline" onClick={()=>{setEditandoLojista(null);setLojista({...vazioLojista});}}>Cancelar</Button></div>
         </>}
@@ -107,6 +110,7 @@ function Admin() {
         <Field label="WhatsApp *"><Input value={lojista.whatsapp} onChange={e=>setLojista({...lojista,whatsapp:e.target.value})}/></Field>
         <Field label="E-mail"><Input type="email" value={lojista.email} onChange={e=>setLojista({...lojista,email:e.target.value})}/></Field>
         <Field label="Instagram da loja"><Input value={lojista.instagram} onChange={e=>setLojista({...lojista,instagram:e.target.value})} placeholder="@nomedaloja ou URL"/></Field>
+        <Field label="Categoria do lojista"><Select value={lojista.categoria} onValueChange={v=>setLojista({...lojista,categoria:v})}><SelectTrigger><SelectValue placeholder="Selecione a categoria"/></SelectTrigger><SelectContent>{CATEGORIAS.map(c=><SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select></Field>
         <Field label="Descrição"><Textarea value={lojista.descricao} onChange={e=>setLojista({...lojista,descricao:e.target.value})}/></Field>
         <Button className="w-full" onClick={cadastrarLojista}><UserPlus className="mr-2 size-4"/>Cadastrar lojista</Button>
       </div>
