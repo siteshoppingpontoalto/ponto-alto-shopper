@@ -71,26 +71,37 @@ function Admin() {
     } finally { e.target.value=""; }
   };
 
-  const salvar=()=>{
-    if(!form.nome.trim()||!form.loja.trim()||!form.whatsapp.trim()||!form.preco){toast.error("Preencha nome, loja, WhatsApp e preço.");return;}
+  const salvar=async()=>{
+    if(!form.nome.trim()||!form.lojistaId||!form.preco){toast.error("Preencha nome, lojista e preço.");return;}
     const dados={nome:form.nome.trim(),loja:form.loja.trim(),whatsapp:form.whatsapp.trim(),breveDescricao:form.breveDescricao.trim(),descricao:form.descricao.trim(),modelo:form.modelo.trim(),cores:form.cores.split(",").map(s=>s.trim()).filter(Boolean),tamanhos:form.tamanhos.split(",").map(s=>s.trim()).filter(Boolean),preco:Number(form.preco.replace(",","."))||0,categoria:form.categoria,fotos:parseFotos(form.fotos),youtubeUrl:form.youtubeUrl.trim(),instagramVideoUrl:form.instagramVideoUrl.trim()};
-    if(editando){updateProduct({...dados,id:editando});toast.success("Produto atualizado.");}else{addProduct(dados);toast.success("Produto cadastrado.");}
-    setForm({...vazio});setEditando(null);
+    try {
+      if(editando){await updateProduct({...dados,id:editando});toast.success("Produto atualizado no Supabase.");}
+      else {await addProduct(dados);toast.success("Produto cadastrado no Supabase.");}
+      setForm({...vazio});setEditando(null);
+    } catch(error) { console.error(error); toast.error("Não foi possível salvar o produto no Supabase."); }
   };
 
-  const cadastrarLojista=()=>{if(!lojista.nomeLoja.trim()||!lojista.responsavel.trim()||!lojista.whatsapp.trim()){toast.error("Preencha loja, responsável e WhatsApp.");return;}addMerchant({...lojista,nomeLoja:lojista.nomeLoja.trim(),responsavel:lojista.responsavel.trim(),whatsapp:lojista.whatsapp.trim(),email:lojista.email.trim(),instagram:lojista.instagram.trim(),descricao:lojista.descricao.trim(),categoria:lojista.categoria});toast.success("Lojista cadastrado.");setLojista({...vazioLojista});};
+  const cadastrarLojista=async()=>{
+    if(!lojista.nomeLoja.trim()||!lojista.responsavel.trim()||!lojista.whatsapp.trim()){toast.error("Preencha loja, responsável e WhatsApp.");return;}
+    try {
+      await addMerchant({...lojista,nomeLoja:lojista.nomeLoja.trim(),responsavel:lojista.responsavel.trim(),whatsapp:lojista.whatsapp.trim(),email:lojista.email.trim(),instagram:lojista.instagram.trim(),descricao:lojista.descricao.trim(),categoria:lojista.categoria});
+      toast.success("Lojista cadastrado no Supabase.");setLojista({...vazioLojista});
+    } catch(error) { console.error(error); toast.error("Não foi possível cadastrar o lojista no Supabase."); }
+  };
 
   const carregarLojista=(id:string)=>{const m=merchants.find(x=>x.id===id);if(!m)return;setEditandoLojista(id);setLojista({nomeLoja:m.nomeLoja,responsavel:m.responsavel,whatsapp:m.whatsapp,email:m.email,instagram:m.instagram,descricao:m.descricao,categoria:m.categoria??CATEGORIAS[0]??""});};
 
-  const salvarEdicaoLojista=()=>{
+  const salvarEdicaoLojista=async()=>{
     if(!editandoLojista)return;
     const anterior=merchants.find(x=>x.id===editandoLojista);if(!anterior)return;
     if(!lojista.nomeLoja.trim()||!lojista.responsavel.trim()||!lojista.whatsapp.trim()){toast.error("Preencha loja, responsável e WhatsApp.");return;}
     const atualizado={...anterior,nomeLoja:lojista.nomeLoja.trim(),responsavel:lojista.responsavel.trim(),whatsapp:lojista.whatsapp.trim(),email:lojista.email.trim(),instagram:lojista.instagram.trim(),descricao:lojista.descricao.trim(),categoria:lojista.categoria};
-    updateMerchant(atualizado);
-    products.filter(p=>p.loja===anterior.nomeLoja&&p.whatsapp===anterior.whatsapp).forEach(p=>updateProduct({...p,loja:atualizado.nomeLoja,whatsapp:atualizado.whatsapp}));
-    toast.success("Lojista atualizado.");
-    setEditandoLojista(null);setLojista({...vazioLojista});
+    try {
+      await updateMerchant(atualizado);
+      for (const p of products.filter(x=>x.loja===anterior.nomeLoja&&x.whatsapp===anterior.whatsapp)) await updateProduct({...p,loja:atualizado.nomeLoja,whatsapp:atualizado.whatsapp});
+      toast.success("Lojista atualizado no Supabase.");
+      setEditandoLojista(null);setLojista({...vazioLojista});
+    } catch(error) { console.error(error); toast.error("Não foi possível atualizar o lojista."); }
   };
 
 
