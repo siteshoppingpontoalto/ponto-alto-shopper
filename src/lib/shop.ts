@@ -25,6 +25,7 @@ export type Merchant = {
   email: string;
   instagram: string;
   descricao: string;
+  categoria?: string;
 };
 
 export type CartItem = {
@@ -61,13 +62,21 @@ export const DEMO_PRODUCTS: Product[] = [
 ];
 
 export const DEMO_MERCHANTS: Merchant[] = [
-  { id:"m1", nomeLoja:"Bella Moda", responsavel:"Atendimento Bella Moda", whatsapp:"5511987650001", email:"", instagram:"", descricao:"Moda feminina." },
-  { id:"m2", nomeLoja:"Don Alberto", responsavel:"Atendimento Don Alberto", whatsapp:"5511987650002", email:"", instagram:"", descricao:"Moda masculina." },
-  { id:"m3", nomeLoja:"Passo Certo Calçados", responsavel:"Atendimento Passo Certo", whatsapp:"5511987650003", email:"", instagram:"", descricao:"Calçados." },
-  { id:"m4", nomeLoja:"Atelier Luna", responsavel:"Atendimento Atelier Luna", whatsapp:"5511987650004", email:"", instagram:"", descricao:"Acessórios." },
-  { id:"m5", nomeLoja:"TecPonto", responsavel:"Atendimento TecPonto", whatsapp:"5511987650005", email:"", instagram:"", descricao:"Eletrônicos." },
-  { id:"m6", nomeLoja:"Mundo Kids", responsavel:"Atendimento Mundo Kids", whatsapp:"5511987650006", email:"", instagram:"", descricao:"Moda infantil." },
+  { id:"m1", nomeLoja:"Bella Moda", responsavel:"Atendimento Bella Moda", whatsapp:"5511987650001", email:"", instagram:"", descricao:"Moda feminina.", categoria:"Moda Feminina" },
+  { id:"m2", nomeLoja:"Don Alberto", responsavel:"Atendimento Don Alberto", whatsapp:"5511987650002", email:"", instagram:"", descricao:"Moda masculina.", categoria:"Moda Masculina" },
+  { id:"m3", nomeLoja:"Passo Certo Calçados", responsavel:"Atendimento Passo Certo", whatsapp:"5511987650003", email:"", instagram:"", descricao:"Calçados.", categoria:"Calçados" },
+  { id:"m4", nomeLoja:"Atelier Luna", responsavel:"Atendimento Atelier Luna", whatsapp:"5511987650004", email:"", instagram:"", descricao:"Acessórios.", categoria:"Acessórios" },
+  { id:"m5", nomeLoja:"TecPonto", responsavel:"Atendimento TecPonto", whatsapp:"5511987650005", email:"", instagram:"", descricao:"Eletrônicos.", categoria:"Eletrônicos" },
+  { id:"m6", nomeLoja:"Mundo Kids", responsavel:"Atendimento Mundo Kids", whatsapp:"5511987650006", email:"", instagram:"", descricao:"Moda infantil.", categoria:"Infantil" },
 ];
+
+export function parseFotos(v: string): string[] {
+  return v
+    .split(/\r?\n/)
+    .flatMap((line) => (line.includes("data:") ? [line] : line.split(",")))
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
 
 function read<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
