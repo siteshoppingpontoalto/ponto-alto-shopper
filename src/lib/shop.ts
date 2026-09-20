@@ -116,8 +116,9 @@ export function useMerchants() {
     if (typeof window !== "undefined" && !window.localStorage.getItem(MERCHANTS_KEY)) write(MERCHANTS_KEY, DEMO_MERCHANTS);
   }, []);
   const addMerchant = (m: Omit<Merchant, "id">) => save([{ ...m, id: crypto.randomUUID() }, ...value]);
+  const updateMerchant = (m: Merchant) => save(value.map((x) => (x.id === m.id ? m : x)));
   const removeMerchant = (id: string) => save(value.filter((x) => x.id !== id));
-  return { merchants: value, hydrated, addMerchant, removeMerchant };
+  return { merchants: value, hydrated, addMerchant, updateMerchant, removeMerchant };
 }
 
 export function useCart() {

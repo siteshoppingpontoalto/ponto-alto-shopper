@@ -30,10 +30,11 @@ const vazioLojista = { nomeLoja:"", responsavel:"", whatsapp:"", email:"", insta
 function Admin() {
   const navigate = useNavigate();
   const { products, addProduct, updateProduct, removeProduct } = useProducts();
-  const { merchants, addMerchant, removeMerchant } = useMerchants();
+  const { merchants, addMerchant, updateMerchant, removeMerchant } = useMerchants();
   const [liberado,setLiberado]=useState(false), [pronto,setPronto]=useState(false), [palavra,setPalavra]=useState("");
   const [form,setForm]=useState({...vazio}), [lojista,setLojista]=useState({...vazioLojista}), [editando,setEditando]=useState<string|null>(null);
-  const [aba,setAba]=useState<"produtos"|"lojistas">("produtos");
+  const [editandoLojista,setEditandoLojista]=useState<string|null>(null);
+  const [aba,setAba]=useState<"produtos"|"lojistas"|"editarLojista">("produtos");
 
   useEffect(()=>{ setLiberado(isAdminUnlocked()); setPronto(true); },[]);
   if(!pronto) return null;
@@ -66,11 +67,40 @@ function Admin() {
 
   const cadastrarLojista=()=>{if(!lojista.nomeLoja.trim()||!lojista.responsavel.trim()||!lojista.whatsapp.trim()){toast.error("Preencha loja, responsável e WhatsApp.");return;}addMerchant({...lojista,nomeLoja:lojista.nomeLoja.trim(),responsavel:lojista.responsavel.trim(),whatsapp:lojista.whatsapp.trim(),email:lojista.email.trim(),instagram:lojista.instagram.trim(),descricao:lojista.descricao.trim()});toast.success("Lojista cadastrado.");setLojista({...vazioLojista});};
 
+  const carregarLojista=(id:string)=>{const m=merchants.find(x=>x.id===id);if(!m)return;setEditandoLojista(id);setLojista({nomeLoja:m.nomeLoja,responsavel:m.responsavel,whatsapp:m.whatsapp,email:m.email,instagram:m.instagram,descricao:m.descricao});};
+
+  const salvarEdicaoLojista=()=>{
+    if(!editandoLojista)return;
+    const anterior=merchants.find(x=>x.id===editandoLojista);if(!anterior)return;
+    if(!lojista.nomeLoja.trim()||!lojista.responsavel.trim()||!lojista.whatsapp.trim()){toast.error("Preencha loja, responsável e WhatsApp.");return;}
+    const atualizado={...anterior,nomeLoja:lojista.nomeLoja.trim(),responsavel:lojista.responsavel.trim(),whatsapp:lojista.whatsapp.trim(),email:lojista.email.trim(),instagram:lojista.instagram.trim(),descricao:lojista.descricao.trim()};
+    updateMerchant(atualizado);
+    products.filter(p=>p.loja===anterior.nomeLoja&&p.whatsapp===anterior.whatsapp).forEach(p=>updateProduct({...p,loja:atualizado.nomeLoja,whatsapp:atualizado.whatsapp}));
+    toast.success("Lojista atualizado.");
+    setEditandoLojista(null);setLojista({...vazioLojista});
+  };
+
+
   return <div className="min-h-screen bg-background"><Header/><div className="mx-auto max-w-6xl px-4 py-8">
     <div className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-2xl font-semibold tracking-tight">Painel administrativo</h1><p className="text-sm text-muted-foreground">Produtos, mídia e cadastro de lojistas</p></div><Button variant="outline" size="sm" onClick={()=>{lockAdmin();navigate({to:"/"})}}>Sair do painel</Button></div>
-    <div className="mt-6 flex gap-2 border-b border-border"><Button variant={aba==="produtos"?"default":"ghost"} onClick={()=>setAba("produtos")}><Store className="mr-2 size-4"/>Produtos</Button><Button variant={aba==="lojistas"?"default":"ghost"} onClick={()=>setAba("lojistas")}><UserPlus className="mr-2 size-4"/>Novo lojista</Button></div>
+    <div className="mt-6 flex gap-2 border-b border-border"><Button variant={aba==="produtos"?"default":"ghost"} onClick={()=>setAba("produtos")}><Store className="mr-2 size-4"/>Produtos</Button><Button variant={aba==="lojistas"?"default":"ghost"} onClick={()=>{setAba("lojistas");setEditandoLojista(null);setLojista({...vazioLojista});}}><UserPlus className="mr-2 size-4"/>Novo lojista</Button><Button variant={aba==="editarLojista"?"default":"ghost"} onClick={()=>{setAba("editarLojista");setLojista({...vazioLojista});}}><Pencil className="mr-2 size-4"/>Editar lojista</Button></div>
 
-    {aba==="lojistas" ? <section className="mt-6 grid gap-8 lg:grid-cols-[400px_1fr]">
+    {aba==="editarLojista" ? <section className="mt-6 grid gap-8 lg:grid-cols-[400px_1fr]">
+      <div className="h-fit space-y-3 rounded-2xl border border-border bg-card p-4"><h2 className="text-sm font-semibold">Editar lojista</h2>
+        {!editandoLojista ? <p className="text-sm text-muted-foreground">Selecione um lojista ao lado para editar suas informações.</p> : <>
+        <Field label="Nome da loja *"><Input value={lojista.nomeLoja} onChange={e=>setLojista({...lojista,nomeLoja:e.target.value})}/></Field>
+        <Field label="Responsável *"><Input value={lojista.responsavel} onChange={e=>setLojista({...lojista,responsavel:e.target.value})}/></Field>
+        <Field label="WhatsApp *"><Input value={lojista.whatsapp} onChange={e=>setLojista({...lojista,whatsapp:e.target.value})}/></Field>
+        <Field label="E-mail"><Input type="email" value={lojista.email} onChange={e=>setLojista({...lojista,email:e.target.value})}/></Field>
+        <Field label="Instagram da loja"><Input value={lojista.instagram} onChange={e=>setLojista({...lojista,instagram:e.target.value})}/></Field>
+        <Field label="Descrição"><Textarea value={lojista.descricao} onChange={e=>setLojista({...lojista,descricao:e.target.value})}/></Field>
+        <div className="flex gap-2"><Button className="flex-1" onClick={salvarEdicaoLojista}>Salvar alterações</Button><Button variant="outline" onClick={()=>{setEditandoLojista(null);setLojista({...vazioLojista});}}>Cancelar</Button></div>
+        </>}
+      </div>
+      <div className="space-y-3"><h2 className="text-sm font-semibold">Lojistas cadastrados ({merchants.length})</h2>
+        {merchants.length===0?<p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">Nenhum lojista cadastrado ainda.</p>:merchants.map(m=><div key={m.id} className={`flex items-start gap-3 rounded-xl border bg-card p-4 ${editandoLojista===m.id?"ring-2 ring-primary":""}`}><Store className="mt-1 size-5"/><div className="min-w-0 flex-1"><p className="font-medium">{m.nomeLoja}</p><p className="text-xs text-muted-foreground">{m.responsavel} · {m.whatsapp}</p>{m.email&&<p className="text-xs text-muted-foreground">{m.email}</p>}{m.instagram&&<p className="text-xs text-muted-foreground">{m.instagram}</p>}<p className="mt-1 text-sm">{m.descricao}</p></div><Button variant={editandoLojista===m.id?"default":"outline"} size="icon" onClick={()=>carregarLojista(m.id)}><Pencil className="size-4"/></Button></div>)}
+      </div>
+    </section> : aba==="lojistas" ? <section className="mt-6 grid gap-8 lg:grid-cols-[400px_1fr]">
       <div className="h-fit space-y-3 rounded-2xl border border-border bg-card p-4"><h2 className="text-sm font-semibold">Cadastro de novo lojista</h2>
         <Field label="Nome da loja *"><Input value={lojista.nomeLoja} onChange={e=>setLojista({...lojista,nomeLoja:e.target.value})} placeholder="Ex.: Bella Moda"/></Field>
         <Field label="Responsável *"><Input value={lojista.responsavel} onChange={e=>setLojista({...lojista,responsavel:e.target.value})}/></Field>
