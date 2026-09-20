@@ -54,7 +54,7 @@ const vazio = {
   cores: "",
   tamanhos: "",
   preco: "",
-  categoria: CATEGORIAS[0],
+  categoria: CATEGORIAS[0] ?? "",
   fotos: "",
 };
 
