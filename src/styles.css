@@ -142,3 +142,11 @@
     color: var(--color-foreground);
   }
 }
+
+
+.shopping-hero{min-height:clamp(360px,46vw,620px);background-image:url("/banner.jpg");background-size:cover;background-position:center;background-repeat:no-repeat}
+.shopping-hero__overlay{min-height:inherit;display:flex;align-items:flex-end;padding:clamp(32px,7vw,88px) 0;background:linear-gradient(90deg,rgba(4,18,38,.82) 0%,rgba(4,18,38,.42) 46%,rgba(4,18,38,.08) 100%)}
+.shopping-hero__eyebrow{margin:0 0 10px;color:#fff;font-size:.85rem;font-weight:700;letter-spacing:.2em}
+.shopping-hero h1{max-width:760px;margin:0;color:#fff;font-size:clamp(2rem,5vw,4.5rem);font-weight:700;line-height:1.02;letter-spacing:-.03em}
+.shopping-hero p:last-child{max-width:620px;margin:16px 0 0;color:rgba(255,255,255,.9);font-size:clamp(1rem,1.8vw,1.25rem)}
+@media (max-width:700px){.shopping-hero__overlay{background:linear-gradient(180deg,rgba(4,18,38,.1),rgba(4,18,38,.82))}}
