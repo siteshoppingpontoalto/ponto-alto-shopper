@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CATEGORIAS, brl, isAdminUnlocked, lockAdmin, unlockAdmin, useMerchants, useProducts, type Product } from "@/lib/shop";
+import { supabase, SUPABASE_BUCKET } from "@/lib/supabase";
 import { Pencil, Trash2, Upload, Youtube, Instagram, Store, UserPlus, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
