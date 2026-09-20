@@ -15,6 +15,10 @@ export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [
     { title: "Painel administrativo — Shopping Ponto Alto" },
     { name: "description", content: "Gerencie produtos, fotos, vídeos e lojistas do Shopping Ponto Alto." },
+    { property: "og:title", content: "Painel administrativo — Shopping Ponto Alto" },
+    { property: "og:description", content: "Gerencie produtos, fotos, vídeos e lojistas do Shopping Ponto Alto." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { name: "robots", content: "noindex" },
   ]}),
   component: Admin,

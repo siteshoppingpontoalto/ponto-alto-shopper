@@ -23,6 +23,8 @@ export const Route = createFileRoute("/carrinho")({
         property: "og:description",
         content: "Finalize seu pedido pelo WhatsApp do lojista.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Carrinho,

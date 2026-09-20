@@ -15,6 +15,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Compre online os produtos dos lojistas do Shopping Ponto Alto por categoria e finalize o pedido direto no WhatsApp da loja." },
       { property: "og:title", content: "Shopping Ponto Alto — Loja Virtual" },
       { property: "og:description", content: "Moda, calçados, acessórios e eletrônicos dos lojistas do Shopping Ponto Alto." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Index,
