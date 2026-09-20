@@ -1,0 +1,29 @@
+[
+  {
+    "id": "produto-exemplo-001",
+    "nome": "Vestido Midi Plissado",
+    "loja": "Bella Moda",
+    "whatsapp": "5571999990000",
+    "breveDescricao": "Vestido leve e elegante para o dia a dia.",
+    "descricao": "Vestido midi em tecido plissado com caimento fluido, forro interno e cinto removível.",
+    "modelo": "Midi Plissado",
+    "cores": [
+      "Preto",
+      "Verde Oliva",
+      "Vinho"
+    ],
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "preco": 219.9,
+    "categoria": "Moda Feminina",
+    "fotos": [
+      "/products/vestido-midi-plissado.svg"
+    ],
+    "youtubeUrl": "",
+    "instagramVideoUrl": ""
+  }
+]
