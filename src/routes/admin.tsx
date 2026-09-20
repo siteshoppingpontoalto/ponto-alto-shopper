@@ -30,10 +30,11 @@ const vazioLojista = { nomeLoja:"", responsavel:"", whatsapp:"", email:"", insta
 function Admin() {
   const navigate = useNavigate();
   const { products, addProduct, updateProduct, removeProduct } = useProducts();
-  const { merchants, addMerchant, removeMerchant } = useMerchants();
+  const { merchants, addMerchant, updateMerchant, removeMerchant } = useMerchants();
   const [liberado,setLiberado]=useState(false), [pronto,setPronto]=useState(false), [palavra,setPalavra]=useState("");
   const [form,setForm]=useState({...vazio}), [lojista,setLojista]=useState({...vazioLojista}), [editando,setEditando]=useState<string|null>(null);
-  const [aba,setAba]=useState<"produtos"|"lojistas">("produtos");
+  const [editandoLojista,setEditandoLojista]=useState<string|null>(null);
+  const [aba,setAba]=useState<"produtos"|"lojistas"|"editarLojista">("produtos");
 
   useEffect(()=>{ setLiberado(isAdminUnlocked()); setPronto(true); },[]);
   if(!pronto) return null;
