@@ -54,10 +54,21 @@ function Admin() {
     const files=Array.from(e.target.files??[]);
     if(!files.length)return;
     const invalid=files.find(f=>!f.type.startsWith("image/")||f.size>3*1024*1024);
-    if(invalid){toast.error("Use imagens de até 3 MB cada.");return;}
-    const urls=await Promise.all(files.map(file=>new Promise<string>((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result));r.onerror=reject;r.readAsDataURL(file);})));
-    setForm(f=>({...f,fotos:[...parseFotos(f.fotos),...urls].join("\n")}));
-    e.target.value="";
+    if(invalid){toast.error("Use imagens de até 3 MB cada.");e.target.value="";return;}
+    try {
+      const urls=await Promise.all(files.map(async(file)=>{
+        const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg";
+        const path="products/"+crypto.randomUUID()+"."+ext;
+        const { error }=await supabase.storage.from(SUPABASE_BUCKET).upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type});
+        if(error) throw error;
+        return supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(path).data.publicUrl;
+      }));
+      setForm(f=>({...f,fotos:[...parseFotos(f.fotos),...urls].join("\n")}));
+      toast.success(urls.length+" foto(s) enviada(s) para o Supabase.");
+    } catch(error) {
+      console.error(error);
+      toast.error("Não foi possível enviar a foto. Verifique o bucket product-images e as políticas do Supabase.");
+    } finally { e.target.value=""; }
   };
 
   const salvar=()=>{
