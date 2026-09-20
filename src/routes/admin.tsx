@@ -6,8 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CATEGORIAS, brl, isAdminUnlocked, lockAdmin, parseFotos, unlockAdmin, useMerchants, useProducts, type Product } from "@/lib/shop";
-import { supabase, SUPABASE_BUCKET } from "@/lib/supabase";
+import { CATEGORIAS, brl, isAdminUnlocked, lockAdmin, parseFotos, unlockAdmin, uploadProductImage, useMerchants, useProducts, type Product } from "@/lib/shop";
 import { Pencil, Trash2, Upload, Youtube, Instagram, Store, UserPlus, ExternalLink, Copy } from "lucide-react";
 import { toast } from "sonner";
 
@@ -55,38 +54,30 @@ function Admin() {
     if(!files.length)return;
     const invalid=files.find(f=>!f.type.startsWith("image/")||f.size>3*1024*1024);
     if(invalid){toast.error("Use imagens de até 3 MB cada.");e.target.value="";return;}
-    try {
-      const urls=await Promise.all(files.map(async(file)=>{
-        const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg";
-        const path="products/"+crypto.randomUUID()+"."+ext;
-        const { error }=await supabase.storage.from(SUPABASE_BUCKET).upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type});
-        if(error) throw error;
-        return supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(path).data.publicUrl;
-      }));
-      setForm(f=>({...f,fotos:[...parseFotos(f.fotos),...urls].join("\n")}));
-      toast.success(urls.length+" foto(s) enviada(s) para o Supabase.");
-    } catch(error) {
-      console.error(error);
-      toast.error("Não foi possível enviar a foto. Verifique o bucket product-images e as políticas do Supabase.");
-    } finally { e.target.value=""; }
+    try{
+      const paths=await Promise.all(files.map(file=>uploadProductImage(file)));
+      setForm(f=>({...f,fotos:[...parseFotos(f.fotos),...paths].join("\n")}));
+      toast.success(paths.length+" foto(s) enviada(s) para o GitHub.");
+    }catch(error){console.error(error);toast.error(error instanceof Error?error.message:"Não foi possível enviar a foto para o GitHub.");}
+    finally{e.target.value="";}
   };
 
   const salvar=async()=>{
     if(!form.nome.trim()||!form.lojistaId||!form.preco){toast.error("Preencha nome, lojista e preço.");return;}
     const dados={nome:form.nome.trim(),loja:form.loja.trim(),whatsapp:form.whatsapp.trim(),breveDescricao:form.breveDescricao.trim(),descricao:form.descricao.trim(),modelo:form.modelo.trim(),cores:form.cores.split(",").map(s=>s.trim()).filter(Boolean),tamanhos:form.tamanhos.split(",").map(s=>s.trim()).filter(Boolean),preco:Number(form.preco.replace(",","."))||0,categoria:form.categoria,fotos:parseFotos(form.fotos),youtubeUrl:form.youtubeUrl.trim(),instagramVideoUrl:form.instagramVideoUrl.trim()};
     try {
-      if(editando){await updateProduct({...dados,id:editando});toast.success("Produto atualizado no Supabase.");}
-      else {await addProduct(dados);toast.success("Produto cadastrado no Supabase.");}
+      if(editando){await updateProduct({...dados,id:editando});toast.success("Produto atualizado no GitHub.");}
+      else {await addProduct(dados);toast.success("Produto cadastrado no GitHub.");}
       setForm({...vazio});setEditando(null);
-    } catch(error) { console.error(error); toast.error("Não foi possível salvar o produto no Supabase."); }
+    } catch(error) { console.error(error); toast.error("Não foi possível salvar o produto no GitHub."); }
   };
 
   const cadastrarLojista=async()=>{
     if(!lojista.nomeLoja.trim()||!lojista.responsavel.trim()||!lojista.whatsapp.trim()){toast.error("Preencha loja, responsável e WhatsApp.");return;}
     try {
       await addMerchant({...lojista,nomeLoja:lojista.nomeLoja.trim(),responsavel:lojista.responsavel.trim(),whatsapp:lojista.whatsapp.trim(),email:lojista.email.trim(),instagram:lojista.instagram.trim(),descricao:lojista.descricao.trim(),categoria:lojista.categoria});
-      toast.success("Lojista cadastrado no Supabase.");setLojista({...vazioLojista});
-    } catch(error) { console.error(error); toast.error("Não foi possível cadastrar o lojista no Supabase."); }
+      toast.success("Lojista cadastrado no GitHub.");setLojista({...vazioLojista});
+    } catch(error) { console.error(error); toast.error("Não foi possível cadastrar o lojista no GitHub."); }
   };
 
   const carregarLojista=(id:string)=>{const m=merchants.find(x=>x.id===id);if(!m)return;setEditandoLojista(id);setLojista({nomeLoja:m.nomeLoja,responsavel:m.responsavel,whatsapp:m.whatsapp,email:m.email,instagram:m.instagram,descricao:m.descricao,categoria:m.categoria??CATEGORIAS[0]??""});};
@@ -99,7 +90,7 @@ function Admin() {
     try {
       await updateMerchant(atualizado);
       for (const p of products.filter(x=>x.loja===anterior.nomeLoja&&x.whatsapp===anterior.whatsapp)) await updateProduct({...p,loja:atualizado.nomeLoja,whatsapp:atualizado.whatsapp});
-      toast.success("Lojista atualizado no Supabase.");
+      toast.success("Lojista atualizado no GitHub.");
       setEditandoLojista(null);setLojista({...vazioLojista});
     } catch(error) { console.error(error); toast.error("Não foi possível atualizar o lojista."); }
   };
