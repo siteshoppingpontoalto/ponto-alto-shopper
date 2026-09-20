@@ -67,6 +67,20 @@ function Admin() {
 
   const cadastrarLojista=()=>{if(!lojista.nomeLoja.trim()||!lojista.responsavel.trim()||!lojista.whatsapp.trim()){toast.error("Preencha loja, responsável e WhatsApp.");return;}addMerchant({...lojista,nomeLoja:lojista.nomeLoja.trim(),responsavel:lojista.responsavel.trim(),whatsapp:lojista.whatsapp.trim(),email:lojista.email.trim(),instagram:lojista.instagram.trim(),descricao:lojista.descricao.trim()});toast.success("Lojista cadastrado.");setLojista({...vazioLojista});};
 
+  const carregarLojista=(id:string)=>{const m=merchants.find(x=>x.id===id);if(!m)return;setEditandoLojista(id);setLojista({nomeLoja:m.nomeLoja,responsavel:m.responsavel,whatsapp:m.whatsapp,email:m.email,instagram:m.instagram,descricao:m.descricao});};
+
+  const salvarEdicaoLojista=()=>{
+    if(!editandoLojista)return;
+    const anterior=merchants.find(x=>x.id===editandoLojista);if(!anterior)return;
+    if(!lojista.nomeLoja.trim()||!lojista.responsavel.trim()||!lojista.whatsapp.trim()){toast.error("Preencha loja, responsável e WhatsApp.");return;}
+    const atualizado={...anterior,nomeLoja:lojista.nomeLoja.trim(),responsavel:lojista.responsavel.trim(),whatsapp:lojista.whatsapp.trim(),email:lojista.email.trim(),instagram:lojista.instagram.trim(),descricao:lojista.descricao.trim()};
+    updateMerchant(atualizado);
+    products.filter(p=>p.loja===anterior.nomeLoja&&p.whatsapp===anterior.whatsapp).forEach(p=>updateProduct({...p,loja:atualizado.nomeLoja,whatsapp:atualizado.whatsapp}));
+    toast.success("Lojista atualizado.");
+    setEditandoLojista(null);setLojista({...vazioLojista});
+  };
+
+
   return <div className="min-h-screen bg-background"><Header/><div className="mx-auto max-w-6xl px-4 py-8">
     <div className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-2xl font-semibold tracking-tight">Painel administrativo</h1><p className="text-sm text-muted-foreground">Produtos, mídia e cadastro de lojistas</p></div><Button variant="outline" size="sm" onClick={()=>{lockAdmin();navigate({to:"/"})}}>Sair do painel</Button></div>
     <div className="mt-6 flex gap-2 border-b border-border"><Button variant={aba==="produtos"?"default":"ghost"} onClick={()=>setAba("produtos")}><Store className="mr-2 size-4"/>Produtos</Button><Button variant={aba==="lojistas"?"default":"ghost"} onClick={()=>setAba("lojistas")}><UserPlus className="mr-2 size-4"/>Novo lojista</Button></div>
