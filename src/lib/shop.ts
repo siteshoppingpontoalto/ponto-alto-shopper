@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export type Product = {
   id: string;
@@ -47,8 +48,6 @@ export const CATEGORIAS = [
   "Beleza",
 ];
 
-const PRODUCTS_KEY = "spa_produtos_v1";
-const MERCHANTS_KEY = "spa_lojistas_v1";
 const CART_KEY = "spa_carrinho_v1";
 const EVENT = "spa_store_change";
 
@@ -74,17 +73,8 @@ export function parseFotos(v: string): string[] {
   return v
     .split(/\r?\n/)
     .flatMap((line) => (line.includes("data:") ? [line] : line.split(",")))
-    .map((s) => s.trim())
+    .map((x) => x.trim())
     .filter(Boolean);
-}
-
-function read<T>(key: string, fallback: T): T {
-  if (typeof window === "undefined") return fallback;
-  try {
-    const raw = window.localStorage.getItem(key);
-    if (!raw) return fallback;
-    return JSON.parse(raw) as T;
-  } catch { return fallback; }
 }
 
 function write(key: string, value: unknown) {
@@ -97,37 +87,182 @@ function useStored<T>(key: string, fallback: T) {
   const [value, setValue] = useState<T>(fallback);
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
-    const sync = () => setValue(read(key, fallback));
-    sync(); setHydrated(true);
+    const sync = () => {
+      try {
+        const raw = window.localStorage.getItem(key);
+        setValue(raw ? JSON.parse(raw) as T : fallback);
+      } catch {
+        setValue(fallback);
+      }
+      setHydrated(true);
+    };
+    sync();
     window.addEventListener(EVENT, sync);
     window.addEventListener("storage", sync);
-    return () => { window.removeEventListener(EVENT, sync); window.removeEventListener("storage", sync); };
+    return () => {
+      window.removeEventListener(EVENT, sync);
+      window.removeEventListener("storage", sync);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
   const save = useCallback((next: T) => write(key, next), [key]);
   return { value, save, hydrated };
 }
 
+function mapProduct(row: any): Product {
+  return {
+    id: row.id,
+    nome: row.nome,
+    loja: row.loja,
+    whatsapp: row.whatsapp,
+    breveDescricao: row.breve_descricao ?? "",
+    descricao: row.descricao ?? "",
+    modelo: row.modelo ?? "",
+    cores: row.cores ?? [],
+    tamanhos: row.tamanhos ?? [],
+    preco: Number(row.preco ?? 0),
+    categoria: row.categoria ?? CATEGORIAS[0],
+    fotos: row.fotos ?? [],
+    youtubeUrl: row.youtube_url ?? "",
+    instagramVideoUrl: row.instagram_video_url ?? "",
+  };
+}
+
+function mapMerchant(row: any): Merchant {
+  return {
+    id: row.id,
+    nomeLoja: row.nome_loja,
+    responsavel: row.responsavel,
+    whatsapp: row.whatsapp,
+    email: row.email ?? "",
+    instagram: row.instagram ?? "",
+    descricao: row.descricao ?? "",
+    categoria: row.categoria ?? CATEGORIAS[0],
+  };
+}
+
 export function useProducts() {
-  const { value, save, hydrated } = useStored<Product[]>(PRODUCTS_KEY, DEMO_PRODUCTS);
-  useEffect(() => {
-    if (typeof window !== "undefined" && !window.localStorage.getItem(PRODUCTS_KEY)) write(PRODUCTS_KEY, DEMO_PRODUCTS);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [hydrated, setHydrated] = useState(false);
+
+  const reload = useCallback(async () => {
+    const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
+    if (error) throw error;
+    setProducts((data ?? []).map(mapProduct));
+    setHydrated(true);
   }, []);
-  const addProduct = (p: Omit<Product, "id">) => save([{ ...p, id: crypto.randomUUID() }, ...value]);
-  const updateProduct = (p: Product) => save(value.map((x) => x.id === p.id ? p : x));
-  const removeProduct = (id: string) => save(value.filter((x) => x.id !== id));
-  return { products: value, hydrated, addProduct, updateProduct, removeProduct };
+
+  useEffect(() => {
+    reload().catch((error) => {
+      console.error(error);
+      setProducts([]);
+      setHydrated(true);
+    });
+  }, [reload]);
+
+  const addProduct = async (p: Omit<Product, "id">) => {
+    const { data, error } = await supabase.from("products").insert({
+      nome: p.nome,
+      loja: p.loja,
+      whatsapp: p.whatsapp,
+      breve_descricao: p.breveDescricao,
+      descricao: p.descricao,
+      modelo: p.modelo,
+      cores: p.cores,
+      tamanhos: p.tamanhos,
+      preco: p.preco,
+      categoria: p.categoria,
+      fotos: p.fotos,
+      youtube_url: p.youtubeUrl,
+      instagram_video_url: p.instagramVideoUrl,
+    }).select().single();
+    if (error) throw error;
+    setProducts((current) => [mapProduct(data), ...current]);
+  };
+
+  const updateProduct = async (p: Product) => {
+    const { data, error } = await supabase.from("products").update({
+      nome: p.nome,
+      loja: p.loja,
+      whatsapp: p.whatsapp,
+      breve_descricao: p.breveDescricao,
+      descricao: p.descricao,
+      modelo: p.modelo,
+      cores: p.cores,
+      tamanhos: p.tamanhos,
+      preco: p.preco,
+      categoria: p.categoria,
+      fotos: p.fotos,
+      youtube_url: p.youtubeUrl,
+      instagram_video_url: p.instagramVideoUrl,
+    }).eq("id", p.id).select().single();
+    if (error) throw error;
+    setProducts((current) => current.map((x) => x.id === p.id ? mapProduct(data) : x));
+  };
+
+  const removeProduct = async (id: string) => {
+    const { error } = await supabase.from("products").delete().eq("id", id);
+    if (error) throw error;
+    setProducts((current) => current.filter((x) => x.id !== id));
+  };
+
+  return { products, hydrated, addProduct, updateProduct, removeProduct, reloadProducts: reload };
 }
 
 export function useMerchants() {
-  const { value, save, hydrated } = useStored<Merchant[]>(MERCHANTS_KEY, DEMO_MERCHANTS);
-  useEffect(() => {
-    if (typeof window !== "undefined" && !window.localStorage.getItem(MERCHANTS_KEY)) write(MERCHANTS_KEY, DEMO_MERCHANTS);
+  const [merchants, setMerchants] = useState<Merchant[]>([]);
+  const [hydrated, setHydrated] = useState(false);
+
+  const reload = useCallback(async () => {
+    const { data, error } = await supabase.from("merchants").select("*").order("created_at", { ascending: false });
+    if (error) throw error;
+    setMerchants((data ?? []).map(mapMerchant));
+    setHydrated(true);
   }, []);
-  const addMerchant = (m: Omit<Merchant, "id">) => save([{ ...m, id: crypto.randomUUID() }, ...value]);
-  const updateMerchant = (m: Merchant) => save(value.map((x) => (x.id === m.id ? m : x)));
-  const removeMerchant = (id: string) => save(value.filter((x) => x.id !== id));
-  return { merchants: value, hydrated, addMerchant, updateMerchant, removeMerchant };
+
+  useEffect(() => {
+    reload().catch((error) => {
+      console.error(error);
+      setMerchants([]);
+      setHydrated(true);
+    });
+  }, [reload]);
+
+  const addMerchant = async (m: Omit<Merchant, "id">) => {
+    const { data, error } = await supabase.from("merchants").insert({
+      nome_loja: m.nomeLoja,
+      responsavel: m.responsavel,
+      whatsapp: m.whatsapp,
+      email: m.email,
+      instagram: m.instagram,
+      descricao: m.descricao,
+      categoria: m.categoria ?? CATEGORIAS[0],
+    }).select().single();
+    if (error) throw error;
+    setMerchants((current) => [mapMerchant(data), ...current]);
+  };
+
+  const updateMerchant = async (m: Merchant) => {
+    const { data, error } = await supabase.from("merchants").update({
+      nome_loja: m.nomeLoja,
+      responsavel: m.responsavel,
+      whatsapp: m.whatsapp,
+      email: m.email,
+      instagram: m.instagram,
+      descricao: m.descricao,
+      categoria: m.categoria ?? CATEGORIAS[0],
+    }).eq("id", m.id).select().single();
+    if (error) throw error;
+    setMerchants((current) => current.map((x) => x.id === m.id ? mapMerchant(data) : x));
+  };
+
+  const removeMerchant = async (id: string) => {
+    const { error } = await supabase.from("merchants").delete().eq("id", id);
+    if (error) throw error;
+    setMerchants((current) => current.filter((x) => x.id !== id));
+  };
+
+  return { merchants, hydrated, addMerchant, updateMerchant, removeMerchant, reloadMerchants: reload };
 }
 
 export function useCart() {
