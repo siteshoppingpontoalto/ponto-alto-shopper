@@ -65,12 +65,12 @@ export const Route = createFileRoute("/api/admin/catalog")({
           }
           if(body.action==="save-products"){
             if(!Array.isArray(body.data))return json(400,{error:"Produtos inválidos."});
-            const result=await writeFile("public/data/products.json",b64Text(JSON.stringify(body.data,null,2)+"\n"),"Atualizar catálogo de produtos");
+            const result=await writeFile("public/data/products.json",b64Text(JSON.stringify(body.data,null,2)+"\n"),"Atualizar catálogo de produtos",config.token,config.repo);
             return json(200,{ok:true,commit:result.commit?.sha});
           }
           if(body.action==="save-merchants"){
             if(!Array.isArray(body.data))return json(400,{error:"Lojistas inválidos."});
-            const result=await writeFile("public/data/merchants.json",b64Text(JSON.stringify(body.data,null,2)+"\n"),"Atualizar catálogo de lojistas");
+            const result=await writeFile("public/data/merchants.json",b64Text(JSON.stringify(body.data,null,2)+"\n"),"Atualizar catálogo de lojistas",config.token,config.repo);
             return json(200,{ok:true,commit:result.commit?.sha});
           }
           return json(400,{error:"Ação inválida."});
