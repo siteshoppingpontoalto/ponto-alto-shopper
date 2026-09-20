@@ -25,6 +25,7 @@ export type Merchant = {
   email: string;
   instagram: string;
   descricao: string;
+  categoria?: string;
 };
 
 export type CartItem = {
