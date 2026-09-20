@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Minus, Plus, Trash2 } from "lucide-react";
 import { brl, onlyDigits, useCart, useProducts, type Product } from "@/lib/shop";
 import { toast } from "sonner";
 
@@ -113,7 +113,7 @@ function Carrinho() {
           <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_360px]">
             <div className="space-y-6">
               {grupos.map((g) => (
-                <div key={g.loja} className="rounded-2xl border border-border bg-card p-4">
+                <div key={g.loja} data-order-group className="rounded-2xl border border-border bg-card p-4">
                   <div className="mb-3 flex items-center justify-between">
                     <h2 className="text-sm font-semibold">Loja: {g.loja}</h2>
                     <span className="text-xs text-muted-foreground">
@@ -221,6 +221,9 @@ function Carrinho() {
                 <span className="text-sm text-muted-foreground">Total geral</span>
                 <span className="text-lg font-semibold">{brl(total)}</span>
               </div>
+              <Button variant="outline" className="h-auto w-full whitespace-normal py-3 text-left text-xs" onClick={()=>document.querySelector<HTMLElement>("[data-order-group]")?.scrollIntoView({behavior:"smooth",block:"center"})}>
+                <ArrowLeft className="size-4 shrink-0" /> Clique ao lado em REALIZAR PEDIDO para realizar a compra individualmente.
+              </Button>
               <p className="text-xs text-muted-foreground">
                 O pedido é enviado por WhatsApp para cada lojista responsável pelos itens.
               </p>

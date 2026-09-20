@@ -60,6 +60,15 @@ export const DEMO_PRODUCTS: Product[] = [
   { id:"p6", nome:"Conjunto Infantil Verão", loja:"Mundo Kids", whatsapp:"5511987650006", breveDescricao:"Camiseta e bermuda em algodão.", descricao:"Conjunto infantil com camiseta estampada e bermuda em moletinho leve, confortável para o verão.", modelo:"Verão Kids", cores:["Amarelo","Azul"], tamanhos:["2","4","6","8"], preco:89.9, categoria:"Infantil", fotos:["https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=800&q=80"], youtubeUrl:"", instagramVideoUrl:"" },
 ];
 
+export const DEMO_MERCHANTS: Merchant[] = [
+  { id:"m1", nomeLoja:"Bella Moda", responsavel:"Atendimento Bella Moda", whatsapp:"5511987650001", email:"", instagram:"", descricao:"Moda feminina." },
+  { id:"m2", nomeLoja:"Don Alberto", responsavel:"Atendimento Don Alberto", whatsapp:"5511987650002", email:"", instagram:"", descricao:"Moda masculina." },
+  { id:"m3", nomeLoja:"Passo Certo Calçados", responsavel:"Atendimento Passo Certo", whatsapp:"5511987650003", email:"", instagram:"", descricao:"Calçados." },
+  { id:"m4", nomeLoja:"Atelier Luna", responsavel:"Atendimento Atelier Luna", whatsapp:"5511987650004", email:"", instagram:"", descricao:"Acessórios." },
+  { id:"m5", nomeLoja:"TecPonto", responsavel:"Atendimento TecPonto", whatsapp:"5511987650005", email:"", instagram:"", descricao:"Eletrônicos." },
+  { id:"m6", nomeLoja:"Mundo Kids", responsavel:"Atendimento Mundo Kids", whatsapp:"5511987650006", email:"", instagram:"", descricao:"Moda infantil." },
+];
+
 function read<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
   try {
@@ -102,7 +111,10 @@ export function useProducts() {
 }
 
 export function useMerchants() {
-  const { value, save, hydrated } = useStored<Merchant[]>(MERCHANTS_KEY, []);
+  const { value, save, hydrated } = useStored<Merchant[]>(MERCHANTS_KEY, DEMO_MERCHANTS);
+  useEffect(() => {
+    if (typeof window !== "undefined" && !window.localStorage.getItem(MERCHANTS_KEY)) write(MERCHANTS_KEY, DEMO_MERCHANTS);
+  }, []);
   const addMerchant = (m: Omit<Merchant, "id">) => save([{ ...m, id: crypto.randomUUID() }, ...value]);
   const removeMerchant = (id: string) => save(value.filter((x) => x.id !== id));
   return { merchants: value, hydrated, addMerchant, removeMerchant };
