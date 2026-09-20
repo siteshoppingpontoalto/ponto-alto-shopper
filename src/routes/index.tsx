@@ -15,6 +15,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Compre online os produtos dos lojistas do Shopping Ponto Alto por categoria e finalize o pedido direto no WhatsApp da loja." },
       { property: "og:title", content: "Shopping Ponto Alto — Loja Virtual" },
       { property: "og:description", content: "Moda, calçados, acessórios e eletrônicos dos lojistas do Shopping Ponto Alto." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Index,
@@ -82,8 +84,9 @@ function Index() {
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
           {lista.map((p) => (
             <button key={p.id} onClick={() => abrir(p)} className="group overflow-hidden rounded-2xl border border-border bg-card text-left transition hover:shadow-lg">
-              <div className="aspect-square overflow-hidden bg-muted">
+              <div className="relative aspect-square overflow-hidden bg-muted">
                 {p.fotos[0] ? <img src={p.fotos[0]} alt={p.nome} className="size-full object-cover transition group-hover:scale-105" /> : null}
+                <span className="absolute inset-x-3 bottom-3 flex translate-y-2 items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground opacity-0 shadow-lg transition group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100"><ShoppingCart className="size-4" />Colocar no carrinho</span>
               </div>
               <div className="space-y-2 p-3">
                 <div className="flex items-center gap-1 text-[11px] text-muted-foreground"><Store className="size-3" /> {p.loja}</div>

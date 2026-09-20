@@ -15,12 +15,16 @@ export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [
     { title: "Painel administrativo — Shopping Ponto Alto" },
     { name: "description", content: "Gerencie produtos, fotos, vídeos e lojistas do Shopping Ponto Alto." },
+    { property: "og:title", content: "Painel administrativo — Shopping Ponto Alto" },
+    { property: "og:description", content: "Gerencie produtos, fotos, vídeos e lojistas do Shopping Ponto Alto." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
     { name: "robots", content: "noindex" },
   ]}),
   component: Admin,
 });
 
-const vazio = { nome:"", loja:"", whatsapp:"", breveDescricao:"", descricao:"", modelo:"", cores:"", tamanhos:"", preco:"", categoria:CATEGORIAS[0] ?? "", fotos:"", youtubeUrl:"", instagramVideoUrl:"" };
+const vazio = { nome:"", lojistaId:"", loja:"", whatsapp:"", breveDescricao:"", descricao:"", modelo:"", cores:"", tamanhos:"", preco:"", categoria:CATEGORIAS[0] ?? "", fotos:"", youtubeUrl:"", instagramVideoUrl:"" };
 const vazioLojista = { nomeLoja:"", responsavel:"", whatsapp:"", email:"", instagram:"", descricao:"" };
 
 function Admin() {
@@ -41,7 +45,7 @@ function Admin() {
     <Button variant="ghost" className="w-full" asChild><Link to="/">Voltar à loja</Link></Button>
   </div></div>;
 
-  const carregar=(p:Product)=>{setEditando(p.id);setAba("produtos");setForm({nome:p.nome,loja:p.loja,whatsapp:p.whatsapp,breveDescricao:p.breveDescricao,descricao:p.descricao,modelo:p.modelo,cores:p.cores.join(", "),tamanhos:p.tamanhos.join(", "),preco:String(p.preco),categoria:p.categoria,fotos:p.fotos.join(", "),youtubeUrl:p.youtubeUrl||"",instagramVideoUrl:p.instagramVideoUrl||""});window.scrollTo({top:0,behavior:"smooth"});};
+  const carregar=(p:Product)=>{const merchant=merchants.find(m=>m.nomeLoja===p.loja&&m.whatsapp===p.whatsapp);setEditando(p.id);setAba("produtos");setForm({nome:p.nome,lojistaId:merchant?.id??"",loja:p.loja,whatsapp:p.whatsapp,breveDescricao:p.breveDescricao,descricao:p.descricao,modelo:p.modelo,cores:p.cores.join(", "),tamanhos:p.tamanhos.join(", "),preco:String(p.preco),categoria:p.categoria,fotos:p.fotos.join(", "),youtubeUrl:p.youtubeUrl||"",instagramVideoUrl:p.instagramVideoUrl||""});window.scrollTo({top:0,behavior:"smooth"});};
 
   const fotosSelecionadas=async(e:React.ChangeEvent<HTMLInputElement>)=>{
     const files=Array.from(e.target.files??[]);
@@ -82,8 +86,8 @@ function Admin() {
     </section> : <section className="mt-6 grid gap-8 lg:grid-cols-[420px_1fr]">
       <div className="h-fit space-y-3 rounded-2xl border border-border bg-card p-4 lg:sticky lg:top-24"><h2 className="text-sm font-semibold">{editando?"Editar produto":"Novo produto"}</h2>
         <Field label="Nome do produto *"><Input value={form.nome} onChange={e=>setForm({...form,nome:e.target.value})}/></Field>
-        <Field label="Nome da loja / lojista *"><Input value={form.loja} onChange={e=>setForm({...form,loja:e.target.value})}/></Field>
-        <Field label="WhatsApp do lojista *"><Input value={form.whatsapp} onChange={e=>setForm({...form,whatsapp:e.target.value})}/></Field>
+        <Field label="Nome da loja / lojista *"><Select value={form.lojistaId} onValueChange={id=>{const merchant=merchants.find(m=>m.id===id);if(!merchant)return;setForm({...form,lojistaId:id,loja:merchant.nomeLoja,whatsapp:merchant.whatsapp});}}><SelectTrigger><SelectValue placeholder="Selecione um lojista"/></SelectTrigger><SelectContent>{merchants.map(m=><SelectItem key={m.id} value={m.id}>{m.nomeLoja}</SelectItem>)}</SelectContent></Select>{merchants.length===0&&<p className="text-[11px] text-destructive">Cadastre um lojista antes de adicionar produtos.</p>}</Field>
+        <Field label="WhatsApp do lojista *"><Input value={form.whatsapp} readOnly placeholder="Preenchido ao selecionar o lojista" className="bg-muted"/></Field>
         <Field label="Breve descrição"><Input value={form.breveDescricao} onChange={e=>setForm({...form,breveDescricao:e.target.value})}/></Field>
         <Field label="Descrição detalhada"><Textarea value={form.descricao} onChange={e=>setForm({...form,descricao:e.target.value})}/></Field>
         <Field label="Modelo"><Input value={form.modelo} onChange={e=>setForm({...form,modelo:e.target.value})}/></Field>
