@@ -120,8 +120,19 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="flex min-h-screen flex-col bg-background">
+        <div className="flex-1">
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+        </div>
+        <footer className="border-t border-border/60 bg-muted/30 py-8 text-center text-sm text-muted-foreground">
+          <div className="mx-auto max-w-6xl px-4 space-y-1">
+            <p className="font-medium text-foreground">Shopping Ponto Alto</p>
+            <p>Endereço: Av. Principal, 1000 - Centro - São Paulo/SP</p>
+            <p className="text-xs pt-2 text-muted-foreground/80">© {new Date().getFullYear()} Shopping Ponto Alto. Todos os direitos reservados.</p>
+          </div>
+        </footer>
+      </div>
       <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );
