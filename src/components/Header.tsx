@@ -43,7 +43,7 @@ export function Header({
             <Sparkles className="size-5" />
           </span>
           <span className="leading-tight">
-            <span className="block text-base font-semibold tracking-tight">
+            <span className="block text-xl font-bold tracking-tight">
               Shopping Ponto Alto
             </span>
             <span className="block text-[11px] text-muted-foreground">

@@ -92,7 +92,7 @@ function Index() {
 
       <section className="border-b border-border/60 bg-secondary/40">
         <div className="mx-auto max-w-6xl px-4 py-10">
-          <h2 className="max-w-2xl text-3xl font-semibold tracking-tight md:text-4xl">Compre dos lojistas do Shopping Ponto Alto</h2>
+          <h2 className="max-w-2xl text-3xl font-semibold tracking-tight md:text-5xl">Compre dos lojistas do <span className="text-primary font-bold">Ponto Alto</span></h2>
           <p className="mt-3 max-w-xl text-sm text-muted-foreground">Escolha os produtos, monte seu carrinho e finalize a compra falando direto com o lojista pelo WhatsApp.</p>
         </div>
       </section>
