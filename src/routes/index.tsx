@@ -61,7 +61,6 @@ function Index() {
         <div className="shopping-hero__overlay">
           <div className="mx-auto w-full max-w-6xl px-4">
             <p className="shopping-hero__eyebrow">SHOPPING PONTO ALTO</p>
-            <h1>As lojas do Shopping Ponto Alto na palma da sua mão</h1>
             <p>Encontre produtos dos lojistas e fale diretamente com a loja pelo WhatsApp.</p>
           </div>
         </div>
