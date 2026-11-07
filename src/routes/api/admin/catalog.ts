@@ -4,9 +4,9 @@ const API = "https://api.github.com";
 type ServerConfig = { repo: string; token: string; adminKey: string };
 
 function getServerConfig(): ServerConfig {
-  const repo = process.env.GITHUB_REPO || "siteshoppingpontoalto/ponto-alto-shopper";
-  const token = process.env.GITHUB_TOKEN || "";
-  const adminKey = process.env.ADMIN_KEYWORD || "pontinho";
+  const repo = process.env["GITHUB_REPO"] || "siteshoppingpontoalto/ponto-alto-shopper";
+  const token = process.env["GITHUB_TOKEN"] || "";
+  const adminKey = process.env["ADMIN_KEYWORD"] || "pontinho";
   if (!token) throw new Error("GITHUB_TOKEN não configurado no servidor do Lovable.");
   return { repo, token, adminKey };
 }
