@@ -8,6 +8,9 @@ import { CATEGORIAS, brl, useCart, useProducts, type Product } from "@/lib/shop"
 import { Store, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 
+import { supabase } from "@/lib/supabase";
+import { CheckCircle2, AlertCircle } from "lucide-react";
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -24,6 +27,27 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { products } = useProducts();
+  const [dbStatus, setDbStatus] = useState<"loading" | "ok" | "error">("loading");
+  const [dbMessage, setDbMessage] = useState<string>("Testando conexão com o Supabase...");
+
+  useState(() => {
+    supabase
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .then(({ error }) => {
+        if (error) {
+          setDbStatus("error");
+          setDbMessage(`Erro na conexão: ${error.message}`);
+        } else {
+          setDbStatus("ok");
+          setDbMessage("Conexão com o Supabase estabelecida com sucesso!");
+        }
+      })
+      .catch((err: any) => {
+        setDbStatus("error");
+        setDbMessage(`Falha ao conectar: ${err?.message || String(err)}`);
+      });
+  });
   const { addItem } = useCart();
   const [busca, setBusca] = useState("");
   const [categoria, setCategoria] = useState<string>("Todas");
@@ -72,6 +96,15 @@ function Index() {
           <p className="mt-3 max-w-xl text-sm text-muted-foreground">Escolha os produtos, monte seu carrinho e finalize a compra falando direto com o lojista pelo WhatsApp.</p>
         </div>
       </section>
+
+      <div className="mx-auto max-w-6xl px-4 py-4">
+        <div className={`flex items-center gap-2 rounded-xl p-3 text-sm ${dbStatus === "ok" ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20" : dbStatus === "error" ? "bg-destructive/10 text-destructive border border-destructive/20" : "bg-muted text-muted-foreground"}`}>
+          {dbStatus === "ok" && <CheckCircle2 className="size-4 shrink-0 text-emerald-600" />}
+          {dbStatus === "error" && <AlertCircle className="size-4 shrink-0" />}
+          {dbStatus === "loading" && <span className="size-3 rounded-full bg-primary animate-pulse" />}
+          <span>{dbMessage}</span>
+        </div>
+      </div>
 
       <div className="mx-auto max-w-6xl px-4 py-6">
         <div className="flex flex-wrap gap-2">
