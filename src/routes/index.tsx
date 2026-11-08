@@ -61,6 +61,9 @@ function Index() {
         <div className="mx-auto max-w-6xl px-4 py-10">
           <h2 className="max-w-2xl text-3xl font-semibold tracking-tight md:text-4xl">Compre dos lojistas do Shopping Ponto Alto</h2>
           <p className="mt-3 max-w-xl text-sm text-muted-foreground">Escolha os produtos, monte seu carrinho e finalize a compra falando direto com o lojista pelo WhatsApp.</p>
+          <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-background/80 px-3 py-1.5 text-xs text-muted-foreground border border-border/60">
+            <span className="font-medium text-foreground">Endereço:</span> Av. Principal, 1000 - Centro, Ponto Alto - SP
+          </div>
         </div>
       </section>
 

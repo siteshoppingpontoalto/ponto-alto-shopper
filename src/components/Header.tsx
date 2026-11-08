@@ -47,7 +47,7 @@ export function Header({
               Shopping Ponto Alto
             </span>
             <span className="block text-[11px] text-muted-foreground">
-              Lojistas reunidos em um só lugar
+              Av. Principal, 1000 · Ponto Alto - SP
             </span>
           </span>
         </Link>
