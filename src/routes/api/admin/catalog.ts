@@ -38,7 +38,13 @@ async function readJson(path:string, token:string, repo:string){
 }
 async function writeFile(path:string,contentBase64:string,message:string, token:string, repo:string){
   let sha:string|undefined;
-  try {\n    sha = (await github(path, token, repo, { method: "GET" })).sha;\n  } catch (error) {\n    // Só permite criar arquivo quando ele realmente não existe. Erros de\n    // autenticação/permissão não podem ser ignorados, pois o PUT falharia depois.\n    if ((error as { status?: number })?.status !== 404) throw error;\n  }
+  try {
+    sha = (await github(path, token, repo, { method: "GET" })).sha;
+  } catch (error) {
+    // Só permite criar arquivo quando ele realmente não existe. Erros de
+    // autenticação/permissão não podem ser ignorados, pois o PUT falharia depois.
+    if ((error as { status?: number })?.status !== 404) throw error;
+  }
   return github(path,token,repo,{method:"PUT",body:JSON.stringify({message,content:contentBase64,sha,branch:"main"})});
 }
 
