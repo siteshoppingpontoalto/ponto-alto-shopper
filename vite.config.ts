@@ -6,6 +6,11 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+// Remover injeção do botão Edit with Lovable injetado por plugins de sandbox
+if (typeof process !== 'undefined') {
+  process.env.VITE_LOVABLE_DEV_BUTTON = 'false';
+}
+
 export default defineConfig({
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
