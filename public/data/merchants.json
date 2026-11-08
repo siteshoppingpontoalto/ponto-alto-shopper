@@ -48,5 +48,55 @@
     "instagram": "@casacharmesba",
     "descricao": "Decoração, aromatizantes de ambiente, utilidades e presentes exclusivos.",
     "categoria": "Casa e Decoração"
+  },
+  {
+    "id": "lojista-6",
+    "nomeLoja": "Trinca Outlet",
+    "responsavel": "Equipe Trinca",
+    "whatsapp": "5571999995555",
+    "email": "contato@trincaoutlet.com.br",
+    "instagram": "@trincaoutlet",
+    "descricao": "Moda jovem, urbana e casual com peças exclusivas e preços de outlet.",
+    "categoria": "Moda Feminina"
+  },
+  {
+    "id": "lojista-7",
+    "nomeLoja": "Ótica Ponto Vision",
+    "responsavel": "Marcos Vinicius",
+    "whatsapp": "5571999996666",
+    "email": "contato@pontovision.com.br",
+    "instagram": "@pontovision",
+    "descricao": "Armações de grife, óculos de sol e lentes com exames e tecnologia de ponta.",
+    "categoria": "Acessórios"
+  },
+  {
+    "id": "lojista-8",
+    "nomeLoja": "Azeite & Sabor Gastronomia",
+    "responsavel": "Chef André",
+    "whatsapp": "5571999997777",
+    "email": "pedidos@azeitesabor.com.br",
+    "instagram": "@azeitesabor",
+    "descricao": "Pratos executivos, lanches gourmet e delícias na praça de alimentação do shopping.",
+    "categoria": "Beleza"
+  },
+  {
+    "id": "lojista-9",
+    "nomeLoja": "Bijou Box Salvador",
+    "responsavel": "Camila Farias",
+    "whatsapp": "5571999998888",
+    "email": "contato@bijoubox.com.br",
+    "instagram": "@bijouboxoficial",
+    "descricao": "Acessórios femininos, semijoias, bolsas e relógios para completar seu look.",
+    "categoria": "Acessórios"
+  },
+  {
+    "id": "lojista-10",
+    "nomeLoja": "Kids & Cia Brinquedos",
+    "responsavel": "Fernanda Costa",
+    "whatsapp": "5571999999999",
+    "email": "contato@kidsciabrinquedos.com.br",
+    "instagram": "@kidsciabrinquedos",
+    "descricao": "Brinquedos educativos, jogos, roupas infantis e diversão garantida para os pequenos.",
+    "categoria": "Infantil"
   }
 ]
