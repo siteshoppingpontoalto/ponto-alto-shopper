@@ -128,7 +128,7 @@ function RootComponent() {
         <footer className="border-t border-border/60 bg-muted/30 py-8 text-center text-sm text-muted-foreground">
           <div className="mx-auto max-w-6xl px-4 space-y-1">
             <p className="font-medium text-foreground">Shopping Ponto Alto</p>
-            <p>Endereço: Av. Principal, 1000 - Centro - São Paulo/SP</p>
+            <p>Endereço: Av. Ponto Alto, 500 - Centro - São Paulo / SP</p>
             <p className="text-xs pt-2 text-muted-foreground/80">© {new Date().getFullYear()} Shopping Ponto Alto. Todos os direitos reservados.</p>
           </div>
         </footer>
