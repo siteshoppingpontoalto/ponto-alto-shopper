@@ -1,12 +1,52 @@
 [
   {
-    "id": "lojista-exemplo-001",
+    "id": "lojista-1",
     "nomeLoja": "Bella Moda",
-    "responsavel": "Atendimento Bella Moda",
+    "responsavel": "Mariana Souza",
     "whatsapp": "5571999990000",
-    "email": "",
-    "instagram": "",
-    "descricao": "Moda feminina.",
+    "email": "contato@bellamoda.com.br",
+    "instagram": "@bellamodasba",
+    "descricao": "Moda feminina com as principais tendências da estação e atendimento exclusivo via WhatsApp.",
     "categoria": "Moda Feminina"
+  },
+  {
+    "id": "lojista-2",
+    "nomeLoja": "Urban Men",
+    "responsavel": "Carlos Eduardo",
+    "whatsapp": "5571999991111",
+    "email": "vendas@urbanmen.com.br",
+    "instagram": "@urbanmensalvador",
+    "descricao": "Moda masculina casual e alfaiataria moderna para o homem contemporâneo.",
+    "categoria": "Moda Masculina"
+  },
+  {
+    "id": "lojista-3",
+    "nomeLoja": "Pé de Atleta Outlet",
+    "responsavel": "Juliana Ramos",
+    "whatsapp": "5571999992222",
+    "email": "contato@pedeatleta.com.br",
+    "instagram": "@pedeatletaoutlet",
+    "descricao": "Calçados esportivos e casuais das maiores marcas globais com descontos imperdíveis.",
+    "categoria": "Calçados"
+  },
+  {
+    "id": "lojista-4",
+    "nomeLoja": "TechPoint Salvador",
+    "responsavel": "Roberto Dias",
+    "whatsapp": "5571999993333",
+    "email": "suporte@techpointsalvador.com",
+    "instagram": "@techpointsalvador",
+    "descricao": "Eletrônicos, smartphones, acessórios de áudio e gadgets tecnológicos.",
+    "categoria": "Eletrônicos"
+  },
+  {
+    "id": "lojista-5",
+    "nomeLoja": "Casa & Charme",
+    "responsavel": "Beatriz Lima",
+    "whatsapp": "5571999994444",
+    "email": "atendimento@casacharme.com.br",
+    "instagram": "@casacharmesba",
+    "descricao": "Decoração, aromatizantes de ambiente, utilidades e presentes exclusivos.",
+    "categoria": "Casa e Decoração"
   }
 ]

@@ -267,6 +267,62 @@ function Index() {
         )}
       </div>
 
+      {/* Rodapé institucional do Shopping Ponto Alto */}
+      <footer className="border-t border-border/80 bg-card mt-16 text-foreground">
+        <div className="mx-auto max-w-6xl px-4 py-12">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+            <div className="space-y-3">
+              <h3 className="text-base font-bold text-primary flex items-center gap-2">
+                <Store className="size-5" /> Shopping Ponto Alto
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                O maior Outlet e Shopping de Salvador. As melhores marcas, descontos imperdíveis e atendimento direto via WhatsApp com os lojistas.
+              </p>
+              <div className="pt-2 text-xs font-medium">
+                <p className="text-foreground">Central: (71) 3000-4000</p>
+                <p className="text-muted-foreground">contato@shoppingpontoalto.com.br</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold uppercase tracking-wider">Departamentos & Lojas</h4>
+              <ul className="space-y-2 text-xs text-muted-foreground">
+                <li><button onClick={() => { setCategoria("Moda Feminina"); setAbaSecao("produtos"); }} className="hover:text-primary transition">Moda Feminina</button></li>
+                <li><button onClick={() => { setCategoria("Moda Masculina"); setAbaSecao("produtos"); }} className="hover:text-primary transition">Moda Masculina</button></li>
+                <li><button onClick={() => { setCategoria("Calçados"); setAbaSecao("produtos"); }} className="hover:text-primary transition">Calçados e Tênis</button></li>
+                <li><button onClick={() => { setCategoria("Eletrônicos"); setAbaSecao("produtos"); }} className="hover:text-primary transition">Eletrônicos e Gadgets</button></li>
+                <li><button onClick={() => { setCategoria("Casa e Decoração"); setAbaSecao("produtos"); }} className="hover:text-primary transition">Casa e Decoração</button></li>
+              </ul>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold uppercase tracking-wider">Serviços ao Cliente</h4>
+              <ul className="space-y-2 text-xs text-muted-foreground">
+                <li><button onClick={() => setAbaSecao("experiencia")} className="hover:text-primary transition">Estacionamento Seguro</button></li>
+                <li><button onClick={() => setAbaSecao("experiencia")} className="hover:text-primary transition">Wi-Fi Gratuito</button></li>
+                <li><button onClick={() => setAbaSecao("experiencia")} className="hover:text-primary transition">Pet Friendly</button></li>
+                <li><button onClick={() => setAbaSecao("experiencia")} className="hover:text-primary transition">Achados e Perdidos</button></li>
+                <li><button onClick={() => setAbaSecao("experiencia")} className="hover:text-primary transition">Como Chegar</button></li>
+              </ul>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold uppercase tracking-wider">Horário de Funcionamento</h4>
+              <div className="text-xs text-muted-foreground space-y-2">
+                <p><strong className="text-foreground">Lojas e Quiosques:</strong><br />Segunda a Sábado: 09h às 21h<br />Domingos e Feriados: 14h às 20h</p>
+                <p><strong className="text-foreground">Praça de Alimentação:</strong><br />Todos os dias: 10h às 22h</p>
+                <p className="pt-1 font-medium text-primary">Av. Principal, 1000 - Salvador, BA</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-10 border-t border-border/60 pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-muted-foreground">
+            <p>© {new Date().getFullYear()} Shopping Ponto Alto. Todos os direitos reservados.</p>
+            <p className="mt-2 md:mt-0">Desenvolvido para oferecer a melhor experiência de compras em Salvador.</p>
+          </div>
+        </div>
+      </footer>
+
       {/* Modal de detalhes do produto */}
       <Dialog open={!!aberto} onOpenChange={(o) => !o && setAberto(null)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
