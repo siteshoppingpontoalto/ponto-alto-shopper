@@ -64,7 +64,7 @@ function Index() {
         <div className="shopping-hero__overlay">
           <div className="mx-auto w-full max-w-6xl px-4">
             <div className="shopping-hero__eyebrow inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1 text-xs font-semibold backdrop-blur">
-              <Sparkles className="size-3.5 text-amber-300" /> O MELHOR SHOPPING E OUTLET DE SALVADOR
+              <Sparkles className="size-3.5 text-amber-300" /> o seu ponto de encontro
             </div>
             <h1 className="mt-3">Grandes marcas, descontos imperdíveis e experiência única</h1>
             <p>
