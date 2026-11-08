@@ -25,7 +25,7 @@ function json(status:number, body:unknown){return Response.json(body,{status});}
 async function github(path:string, token:string, repo:string, init:RequestInit={}) {
   const r=await fetch(`${API}/repos/${repo}/contents/${path}`,{...init,headers:{...headers(token),...(init.headers||{})}});
   const body=await r.json().catch(()=>({}));
-  if(!r.ok) throw new Error(body?.message || `GitHub HTTP ${r.status}`);
+  if(!r.ok) throw Object.assign(new Error(body?.message || `GitHub HTTP ${r.status}`), { status: r.status });
   return body as any;
 }
 function b64Text(value:string){const bytes=new TextEncoder().encode(value);let binary="";for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return btoa(binary);}
@@ -38,7 +38,7 @@ async function readJson(path:string, token:string, repo:string){
 }
 async function writeFile(path:string,contentBase64:string,message:string, token:string, repo:string){
   let sha:string|undefined;
-  try{sha=(await github(path,token,repo,{method:"GET"})).sha;}catch{}
+  try {\n    sha = (await github(path, token, repo, { method: "GET" })).sha;\n  } catch (error) {\n    // Só permite criar arquivo quando ele realmente não existe. Erros de\n    // autenticação/permissão não podem ser ignorados, pois o PUT falharia depois.\n    if ((error as { status?: number })?.status !== 404) throw error;\n  }
   return github(path,token,repo,{method:"PUT",body:JSON.stringify({message,content:contentBase64,sha,branch:"main"})});
 }
 
