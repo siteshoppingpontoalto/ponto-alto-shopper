@@ -57,16 +57,6 @@ function Index() {
     <div className="min-h-screen bg-background">
       <Header busca={busca} onBusca={setBusca} />
 
-      <section className="shopping-hero" aria-label="Shopping Ponto Alto">
-        <div className="shopping-hero__overlay">
-          <div className="mx-auto w-full max-w-6xl px-4">
-            <p className="shopping-hero__eyebrow">SHOPPING PONTO ALTO</p>
-            <h1>As lojas do Shopping Ponto Alto na palma da sua mão</h1>
-            <p>Encontre produtos dos lojistas e fale diretamente com a loja pelo WhatsApp.</p>
-          </div>
-        </div>
-      </section>
-
       <section className="border-b border-border/60 bg-secondary/40">
         <div className="mx-auto max-w-6xl px-4 py-10">
           <h2 className="max-w-2xl text-3xl font-semibold tracking-tight md:text-4xl">Compre dos lojistas do Shopping Ponto Alto</h2>
