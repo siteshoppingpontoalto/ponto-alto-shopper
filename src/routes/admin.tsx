@@ -69,7 +69,7 @@ function Admin() {
       if(editando){await updateProduct({...dados,id:editando});toast.success("Produto atualizado no GitHub.");}
       else {await addProduct(dados);toast.success("Produto cadastrado no GitHub.");}
       setForm({...vazio});setEditando(null);
-    } catch(error) { console.error(error); toast.error("Não foi possível salvar o produto no GitHub."); }
+    } catch(error) { console.error(error); toast.error(error instanceof Error ? error.message : "Não foi possível salvar o produto no GitHub."); }
   };
 
   const cadastrarLojista=async()=>{
@@ -77,7 +77,7 @@ function Admin() {
     try {
       await addMerchant({...lojista,nomeLoja:lojista.nomeLoja.trim(),responsavel:lojista.responsavel.trim(),whatsapp:lojista.whatsapp.trim(),email:lojista.email.trim(),instagram:lojista.instagram.trim(),descricao:lojista.descricao.trim(),categoria:lojista.categoria});
       toast.success("Lojista cadastrado no GitHub.");setLojista({...vazioLojista});
-    } catch(error) { console.error(error); toast.error("Não foi possível cadastrar o lojista no GitHub."); }
+    } catch(error) { console.error(error); toast.error(error instanceof Error ? error.message : "Não foi possível cadastrar o lojista no GitHub."); }
   };
 
   const carregarLojista=(id:string)=>{const m=merchants.find(x=>x.id===id);if(!m)return;setEditandoLojista(id);setLojista({nomeLoja:m.nomeLoja,responsavel:m.responsavel,whatsapp:m.whatsapp,email:m.email,instagram:m.instagram,descricao:m.descricao,categoria:m.categoria??CATEGORIAS[0]??""});};
@@ -92,7 +92,7 @@ function Admin() {
       for (const p of products.filter(x=>x.loja===anterior.nomeLoja&&x.whatsapp===anterior.whatsapp)) await updateProduct({...p,loja:atualizado.nomeLoja,whatsapp:atualizado.whatsapp});
       toast.success("Lojista atualizado no GitHub.");
       setEditandoLojista(null);setLojista({...vazioLojista});
-    } catch(error) { console.error(error); toast.error("Não foi possível atualizar o lojista."); }
+    } catch(error) { console.error(error); toast.error(error instanceof Error ? error.message : "Não foi possível atualizar o lojista."); }
   };
 
 
